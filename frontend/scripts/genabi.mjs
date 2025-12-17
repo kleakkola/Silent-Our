@@ -107,6 +107,9 @@ export const SilentOurAddresses = ${JSON.stringify(deployments, null, 2)} as con
   
   console.log("ABI files generated successfully!");
   console.log(`Found deployments for ${Object.keys(deployments).length} networks`);
+  if (Object.keys(deployments).length === 0) {
+    console.warn("Warning: No deployments found. Make sure contracts are deployed first.");
+  }
 }
 
 main();
