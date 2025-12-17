@@ -71,7 +71,7 @@ const config: HardhatUserConfig = {
       },
       optimizer: {
         enabled: true,
-        runs: 800,
+        runs: 800, // Optimize for contract size
       },
       evmVersion: "cancun",
     },
