@@ -11,8 +11,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     waitConfirmations: 1,
   });
 
-  console.log(`SilentOur contract deployed at: ${deployedSilentOur.address}`);
-  console.log(`Transaction hash: ${deployedSilentOur.transactionHash}`);
+  console.log(`SilentOur contract: `, deployedSilentOur.address);
 };
 export default func;
 func.id = "deploy_silentOur"; // id required to prevent reexecution
