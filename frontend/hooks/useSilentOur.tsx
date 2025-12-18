@@ -223,37 +223,50 @@ function normalizeHandle(handle: unknown): string | undefined {
   }
 
   // Try using ethers hexlify to convert
-  try {
-    const hexString = ethers.hexlify(handle);
-    // Ensure it's 32 bytes format
-    if (hexString.length === 66) {
-      if (hexString === ethers.ZeroHash) {
-        console.log("[normalizeHandle] hexlify result is zero hash, returning undefined");
-        return undefined;
-      }
-      console.log("[normalizeHandle] Converted via hexlify:", hexString);
-      return hexString;
-    }
-    // If not 32 bytes, try to normalize
-    if (hexString.startsWith("0x")) {
-      const hexWithoutPrefix = hexString.slice(2);
-      if (hexWithoutPrefix.length <= 64) {
-        const paddedHex = hexWithoutPrefix.padStart(64, "0");
-        const normalized = "0x" + paddedHex;
-        if (normalized === ethers.ZeroHash) {
-          console.log("[normalizeHandle] Normalized hexlify result is zero hash, returning undefined");
+  // Check if handle is a valid BytesLike type before calling hexlify
+  if (
+    typeof handle === "string" ||
+    typeof handle === "bigint" ||
+    typeof handle === "number" ||
+    handle instanceof Uint8Array ||
+    Array.isArray(handle)
+  ) {
+    try {
+      const hexString = ethers.hexlify(handle as ethers.BytesLike);
+      // Ensure it's 32 bytes format
+      if (hexString.length === 66) {
+        if (hexString === ethers.ZeroHash) {
+          console.log("[normalizeHandle] hexlify result is zero hash, returning undefined");
           return undefined;
         }
-        console.log("[normalizeHandle] Normalized hexlify result:", normalized);
-        return normalized;
+        console.log("[normalizeHandle] Converted via hexlify:", hexString);
+        return hexString;
       }
+      // If not 32 bytes, try to normalize
+      if (hexString.startsWith("0x")) {
+        const hexWithoutPrefix = hexString.slice(2);
+        if (hexWithoutPrefix.length <= 64) {
+          const paddedHex = hexWithoutPrefix.padStart(64, "0");
+          const normalized = "0x" + paddedHex;
+          if (normalized === ethers.ZeroHash) {
+            console.log("[normalizeHandle] Normalized hexlify result is zero hash, returning undefined");
+            return undefined;
+          }
+          console.log("[normalizeHandle] Normalized hexlify result:", normalized);
+          return normalized;
+        }
+      }
+      console.log("[normalizeHandle] hexlify result invalid, returning undefined");
+      return undefined;
+    } catch (e) {
+      console.log("[normalizeHandle] hexlify failed:", e);
+      return undefined;
     }
-    console.log("[normalizeHandle] hexlify result invalid, returning undefined");
-    return undefined;
-  } catch (e) {
-    console.log("[normalizeHandle] hexlify failed:", e);
-    return undefined;
   }
+  
+  // If handle is not a valid BytesLike type, return undefined
+  console.log("[normalizeHandle] Handle is not a valid BytesLike type, returning undefined");
+  return undefined;
 }
 
 export const useSilentOur = (parameters: {
